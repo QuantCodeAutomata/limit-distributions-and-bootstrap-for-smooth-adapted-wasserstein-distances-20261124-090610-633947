@@ -161,7 +161,7 @@ and larger M.
   (unspecified for this worked example, but used elsewhere in the paper)
   M = 20,000 and 500,000 reference draws. Run the paper-scale configuration
   with `python -m exp.exp2 --full`.
-- Experiment 2's parameters a = 1.2, b = 0.8, sigma = 0.65 are not specified
+- Experiment 2's parameters a = 1.0, b = 0.6, sigma = 0.65 are not specified
   by the paper, which states the formulas for general a, b, sigma > 0 without
   giving numerical values for this worked example; they were chosen to keep
   the two chi-square/quartic components of comparable scale.
@@ -171,6 +171,9 @@ and larger M.
   result theoretically (Proposition 2.8) and specifies no numerical
   configuration for a demonstration. Run the paper-scale configuration with
   `python -m exp.exp3 --full`.
+- Experiment 3's supplementary robustness check only evaluates p = 3 with
+  sigma = 0.5 (divergent, zeta_p = 0.1333) in this run, instead of also
+  evaluating p = 6 alongside p = 3; `--full` adds the p = 6 case.
 - Experiment 1's coverage of the nominal 95% distance bound falls slightly
   outside the paper's reported band of 94.2%-96.3% at two of the ten (n, p)
   cells (n=800, both p values, at 99.17%); this is attributed to the reduced
