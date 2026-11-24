@@ -37,7 +37,7 @@ RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
 
 
 def scaled_wp_distribution(
-    s: float, sigma: float, p: float, n: int, m_replications: int, rng: np.random.Generator
+    s: float, sigma: float, p: float, n: int, m_replications: int, rng: np.random.Generator, grid_points: int
 ) -> np.ndarray:
     """Monte Carlo draws of sqrt(n)*W_p(P_n, P) for one (s, sigma, p, n)."""
     values = []
@@ -45,20 +45,23 @@ def scaled_wp_distribution(
     for batch in iter_gaussian_sample(s, n, m_replications, rng, batch_size=cfg.EXP3_BATCH_SIZE):
         for samples in batch:
             w_p = wasserstein_p_quantile_coupling(
-                samples, s, sigma, p, cfg.EXP3_QUAD_NODES, cfg.EXP3_EPS_TRUNC, cfg.EXP3_GRID_POINTS
+                samples, s, sigma, p, cfg.EXP3_QUAD_NODES, cfg.EXP3_EPS_TRUNC, grid_points
             )
             values.append(sqrt_n * w_p)
     return np.asarray(values)
 
 
-def run_regime(label: str, s: float, sigma: float, p: float, n_values: tuple[int, ...], m_replications: int, seed: int) -> dict:
+def run_regime(
+    label: str, s: float, sigma: float, p: float, n_values: tuple[int, ...], m_replications: int, seed: int,
+    grid_points: int,
+) -> dict:
     zeta_p = critical_exponent(p, s, sigma)
     print(f"{label}: s={s} sigma={sigma} p={p} sigma^2={sigma**2:.4f} (p-2)s^2={(p-2)*s**2:.4f} zeta_p={zeta_p:.5f}")
     out = {"label": label, "s": s, "sigma": sigma, "p": p, "zeta_p": zeta_p, "by_n": []}
     for n in n_values:
         t0 = time.time()
         rng = np.random.default_rng(seed + n)
-        dist = scaled_wp_distribution(s, sigma, p, n, m_replications, rng)
+        dist = scaled_wp_distribution(s, sigma, p, n, m_replications, rng, grid_points)
         row = {
             "n": n,
             "median": float(np.median(dist)),
@@ -74,24 +77,29 @@ def run_regime(label: str, s: float, sigma: float, p: float, n_values: tuple[int
 def main(full: bool) -> None:
     n_values = cfg.EXP3_N_VALUES_PAPER if full else cfg.EXP3_N_VALUES_RUN
     m_replications = cfg.EXP3_M_REPLICATIONS_PAPER if full else cfg.EXP3_M_REPLICATIONS_RUN
+    grid_points = cfg.EXP3_GRID_POINTS_PAPER if full else cfg.EXP3_GRID_POINTS_RUN
+    extra_p_values = cfg.EXP3_EXTRA_P_VALUES_PAPER if full else cfg.EXP3_EXTRA_P_VALUES_RUN
 
     divergent = run_regime(
         "divergent (sigma^2 < (p-2)s^2)", cfg.EXP3_S, cfg.EXP3_SIGMA_DIVERGENT, cfg.EXP3_P_DIVERGENT,
-        n_values, m_replications, cfg.EXP3_SEED,
+        n_values, m_replications, cfg.EXP3_SEED, grid_points,
     )
     well_behaved = run_regime(
         "well-behaved (sigma^2 >= (p-2)s^2)", cfg.EXP3_S, cfg.EXP3_SIGMA_WELLBEHAVED, cfg.EXP3_P_DIVERGENT,
-        n_values, m_replications, cfg.EXP3_SEED + 777,
+        n_values, m_replications, cfg.EXP3_SEED + 777, grid_points,
     )
 
     extra = []
-    for p in cfg.EXP3_EXTRA_P_VALUES:
+    for p in extra_p_values:
         extra.append(run_regime(
-            f"divergent, p={p}", cfg.EXP3_S, cfg.EXP3_SIGMA_DIVERGENT, p, n_values, m_replications, cfg.EXP3_SEED + 10 * p,
+            f"divergent, p={p}", cfg.EXP3_S, cfg.EXP3_SIGMA_DIVERGENT, p, n_values, m_replications,
+            cfg.EXP3_SEED + 10 * p, grid_points,
         ))
 
     results = {
-        "config": {"n_values": list(n_values), "m_replications": m_replications, "full": full},
+        "config": {
+            "n_values": list(n_values), "m_replications": m_replications, "grid_points": grid_points, "full": full,
+        },
         "divergent": divergent, "well_behaved": well_behaved, "extra_p": extra,
     }
     RESULTS_DIR.mkdir(exist_ok=True)

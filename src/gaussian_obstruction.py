@@ -40,12 +40,24 @@ def population_quantile(u: np.ndarray, s: float, sigma: float) -> np.ndarray:
     return tau * norm.ppf(u)
 
 
+_SAMPLE_CHUNK = 2000  # caps the temporary (len(x), chunk) array at a few hundred MB
+
+
 def smoothed_empirical_cdf(x: np.ndarray, samples: np.ndarray, sigma: float) -> np.ndarray:
     """F_n(x) = (1/n) * sum_i Phi((x - A^{(i)})/sigma) (implementation notes).
 
-    ``samples`` has shape (n,); ``x`` may be any broadcastable array.
+    ``samples`` has shape (n,); ``x`` may be any broadcastable array. The sum
+    over ``samples`` is accumulated in chunks so that the temporary
+    (len(x), chunk) array stays small regardless of n, avoiding the O(n *
+    len(x)) memory blow-up of a single broadcast for large n.
     """
-    return np.mean(norm.cdf((x[..., None] - samples[None, :]) / sigma), axis=-1)
+    x = np.asarray(x)
+    n = samples.shape[0]
+    total = np.zeros(x.shape, dtype=np.float64)
+    for start in range(0, n, _SAMPLE_CHUNK):
+        block = samples[start:start + _SAMPLE_CHUNK]
+        total += np.sum(norm.cdf((x[..., None] - block[None, :]) / sigma), axis=-1)
+    return total / n
 
 
 def invert_smoothed_empirical_cdf(
