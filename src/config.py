@@ -111,6 +111,7 @@ EXP3_QUAD_NODES = 200       # Gauss-Legendre nodes for the W_p quantile integral
 EXP3_EPS_TRUNC = 1e-10      # edge truncation for the quantile integral
 EXP3_GRID_POINTS = 4000     # grid resolution for inverting the smoothed empirical CDF
 EXP3_SEED = 20261116  # not specified in the paper; reuses the paper's Section 3.3 seed
+EXP3_BATCH_SIZE = 20  # datasets per batch in iter_gaussian_sample; memory/runtime tradeoff
 
 # Additional p values tested for robustness (not specified in the paper beyond
 # the single worked example, used only as a supplementary check).
