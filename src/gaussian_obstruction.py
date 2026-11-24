@@ -44,7 +44,7 @@ _SAMPLE_CHUNK = 2000  # caps the temporary (len(x), chunk) array at a few hundre
 
 
 def smoothed_empirical_cdf(x: np.ndarray, samples: np.ndarray, sigma: float) -> np.ndarray:
-    """F_n(x) = (1/n) * sum_i Phi((x - A^{(i)})/sigma) (implementation notes).
+    """F_n(x) = (1/n) * sum_i Phi((x - A^{(i)})/sigma).
 
     ``samples`` has shape (n,); ``x`` may be any broadcastable array. The sum
     over ``samples`` is accumulated in chunks so that the temporary
@@ -63,7 +63,7 @@ def smoothed_empirical_cdf(x: np.ndarray, samples: np.ndarray, sigma: float) -> 
 def invert_smoothed_empirical_cdf(
     u: np.ndarray, samples: np.ndarray, sigma: float, grid_points: int, x_pad: float = 12.0
 ) -> np.ndarray:
-    """F_n^{-1}(u) by linear interpolation of F_n on a fine grid (implementation notes).
+    """F_n^{-1}(u) by linear interpolation of F_n on a fine grid.
 
     The grid spans [-x_pad*scale, x_pad*scale] where ``scale`` is the sample
     standard deviation plus sigma, wide enough to cover the extreme quantiles
@@ -87,7 +87,7 @@ def wasserstein_p_quantile_coupling(
     """W_p(P_n, P) via W_p(P_n,P)^p = integral_0^1 |F_n^{-1}(u)-F^{-1}(u)|^p du.
 
     Evaluated by Gauss-Legendre quadrature on [eps_trunc, 1-eps_trunc]
-    (implementation notes, Section 4.3).
+    (Section 4.3).
     """
     nodes, weights = gauss_legendre_interval(n_nodes, eps_trunc, 1.0 - eps_trunc)
     f_pop = population_quantile(nodes, s, sigma)

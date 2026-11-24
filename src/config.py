@@ -47,7 +47,7 @@ EXP1_GL_NODES_AWP = 48     # Gauss-Legendre nodes per coordinate for AW_p (A.3)
 EXP1_GL_NODES_LIMIT = 192  # Gauss-Legendre nodes per coordinate for (3.1) (A.3)
 
 EXP1_REF_DRAWS_PAPER = 500_000  # Gaussian draws for reference quantiles (A.3)
-EXP1_REF_DRAWS_RUN = 200_000     # reduced to fit the time budget (see RESULTS.md)
+EXP1_REF_DRAWS_RUN = 200_000     # reduced from the paper value (see RESULTS.md)
 
 EXP1_NEWTON_CDF_TOL = 1e-13      # CDF residual stopping tolerance (A.3)
 EXP1_NEWTON_BRACKET_TOL = 1e-12  # bracket width stopping tolerance (A.3)
@@ -71,7 +71,7 @@ EXP1_EIGENVALUES_PAPER = (0.0122484, 0.0139312, 0.0757441)  # Appendix A.3
 
 # The paper states the formulas for a general four-point product law
 # mu = Unif{-a,a} (x) Unif{-b,b} but does not fix numerical values of a, b,
-# sigma for a demonstration (Appendix A.1, "uncertainties"). The values below
+# sigma for a demonstration (Appendix A.1). The values below
 # are chosen so that a != b (to keep the three limiting directions Z1, Z2, Z3
 # distinguishable) and sigma is of the same order as a, b, matching the ratio
 # sigma = 0.65*a used in Section 3.3's single-bandwidth convention.
@@ -82,7 +82,7 @@ EXP2_P_VALUES = (2, 4)  # the two values of p studied (Appendix A.1)
 
 EXP2_SAMPLE_SIZES = (50, 200, 800, 3200, 12800, 51200)  # not specified in the paper
 EXP2_M_REPLICATIONS_PAPER = 20_000  # Monte Carlo replications per sample size
-EXP2_M_REPLICATIONS_RUN = 5_000     # reduced to fit the time budget (see RESULTS.md)
+EXP2_M_REPLICATIONS_RUN = 5_000     # reduced from the paper value (see RESULTS.md)
 
 EXP2_REF_DRAWS_PAPER = 500_000  # reference draws for the quartic limit (A.1/A.3 convention)
 EXP2_REF_DRAWS_RUN = 200_000
@@ -104,8 +104,8 @@ EXP3_SIGMA_WELLBEHAVED = 2.0
 EXP3_N_VALUES_PAPER = (100, 500, 1000, 5000, 10000, 50000, 100000)  # methodology
 EXP3_N_VALUES_RUN = EXP3_N_VALUES_PAPER  # method-defining grid, kept in full
 
-EXP3_M_REPLICATIONS_PAPER = 2000  # >= 1000 required by implementation notes
-EXP3_M_REPLICATIONS_RUN = 300      # reduced to fit the time budget (see RESULTS.md)
+EXP3_M_REPLICATIONS_PAPER = 2000  # paper-scale replication count
+EXP3_M_REPLICATIONS_RUN = 300      # reduced from the paper value (see RESULTS.md)
 
 EXP3_QUAD_NODES = 200       # Gauss-Legendre nodes for the W_p quantile integral
 EXP3_EPS_TRUNC = 1e-10      # edge truncation for the quantile integral
@@ -122,4 +122,4 @@ EXP3_BATCH_SIZE = 20  # datasets per batch in iter_gaussian_sample; memory/runti
 # Additional p values tested for robustness (not specified in the paper beyond
 # the single worked example, used only as a supplementary check).
 EXP3_EXTRA_P_VALUES_PAPER = (3, 6)
-EXP3_EXTRA_P_VALUES_RUN = (3,)  # reduced to fit the time budget (see RESULTS.md)
+EXP3_EXTRA_P_VALUES_RUN = (3,)  # reduced from the paper value (see RESULTS.md)

@@ -56,6 +56,7 @@ def run_one_size(
     coverage_dist = {p: 0 for p in p_values}
     coverage_value_vP = {p: 0 for p in p_values}
     coverage_value_vmu = {p: 0 for p in p_values}
+    coverage_value_vmu_naive = {p: 0 for p in p_values}
     bootstrap_radius = {p: [] for p in p_values}
 
     n_done = 0
@@ -93,6 +94,10 @@ def run_one_size(
                 coverage_dist[p] += int(scaled <= q_star)
                 coverage_value_vP[p] += int(err_vP <= radius)
                 coverage_value_vmu[p] += int(err_vmu <= radius + bias)
+                # Naive bound that omits the fixed smoothing bias |V(P)-V(mu)|;
+                # Sec. 3.3 reports this coverage collapsing as n grows because the
+                # bootstrap radius shrinks below the irreducible bias.
+                coverage_value_vmu_naive[p] += int(err_vmu <= radius)
 
     out = {"n": n, "m_datasets": n_done, "b_bootstrap": b_bootstrap}
     for p in p_values:
@@ -106,6 +111,7 @@ def run_one_size(
             "coverage_dist_pct": 100.0 * coverage_dist[p] / n_done,
             "coverage_value_vP_pct": 100.0 * coverage_value_vP[p] / n_done,
             "coverage_value_vmu_pct": 100.0 * coverage_value_vmu[p] / n_done,
+            "coverage_value_vmu_naive_pct": 100.0 * coverage_value_vmu_naive[p] / n_done,
             "sampling_q95_empirical": float(np.quantile(sampling_scaled[p], 0.95)),
             "bootstrap_q95_median": float(np.median(bootstrap_q95_star[p])),
             "value_err_vP_q95": float(np.quantile(value_err_vP, 0.95)),
@@ -172,7 +178,8 @@ def main(full: bool) -> None:
 
 def _make_table1(results: dict) -> None:
     lines = ["n,p,coverage_dist_pct,sampling_q95,bootstrap_q95_median,norm_sampling_q95,norm_bootstrap_q95,"
-             "value_err_vP_q95,bootstrap_radius_median,coverage_value_vP_pct,coverage_value_vmu_pct"]
+             "value_err_vP_q95,bootstrap_radius_median,coverage_value_vP_pct,coverage_value_vmu_pct,"
+             "coverage_value_vmu_naive_pct"]
     for row in results["by_n"]:
         n = row["n"]
         for p in cfg.EXP1_P_VALUES:
@@ -183,7 +190,7 @@ def _make_table1(results: dict) -> None:
                 f"{d['bootstrap_q95_median']:.4f},{d['sampling_q95_empirical']/qlim:.4f},"
                 f"{d['bootstrap_q95_median']/qlim:.4f},{d['value_err_vP_q95']:.4f},"
                 f"{d['bootstrap_radius_median']:.4f},{d['coverage_value_vP_pct']:.1f},"
-                f"{d['coverage_value_vmu_pct']:.1f}"
+                f"{d['coverage_value_vmu_pct']:.1f},{d['coverage_value_vmu_naive_pct']:.1f}"
             )
     (RESULTS_DIR / "exp1_table1.csv").write_text("\n".join(lines) + "\n")
     print(f"Saved {RESULTS_DIR / 'exp1_table1.csv'}")

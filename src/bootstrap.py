@@ -4,7 +4,7 @@
 ..., and each bootstrap draw resamples multinomial counts from the empirical
 weights." Resampling whole paths (not marginal coordinates) is what retains
 the cross-date dependence that the adapted Wasserstein distance is sensitive
-to (Section 3.3, implementation notes).
+(Section 3.3).
 """
 
 from __future__ import annotations
